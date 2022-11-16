@@ -1,7 +1,12 @@
 
-# compilation and binary files and folders
-bin
-object
-run
+# editor/IDE settings
+*.vscode
 
+# build files and folders
+/bin
+/object
+run
+*.out
+
+# others
 TODO.txt
