@@ -1,2 +1,7 @@
 
+# compilation and binary files and folders
+bin
+object
+run
+
 TODO.txt
