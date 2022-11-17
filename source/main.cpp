@@ -10,8 +10,10 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 #include "../include/utils.h"
+#include "../include/tinyxml2.h"
 
 using namespace std;
+using namespace tinyxml2;
 
 #define WINDOW_WIDTH 1200
 #define WINDOW_HEIGHT 600
