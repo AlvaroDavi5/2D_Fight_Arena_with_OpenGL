@@ -15,8 +15,8 @@ OBJ=$(subst .cpp,.o,$(subst source,object,$(C_SOURCE)))
 # definindo compilador e flags
 CPL=g++
 
-C_FLAGS= -Wall -g
-CPP_FLAGS=-lGL \
+CPL_FLAGS= -Wall -g
+GL_FLAGS=-lGL \
           -lGLU \
           -lglut
 # usado Space no lugar de Tab para evitar erros
@@ -58,7 +58,7 @@ objectFolder:
 
 # o target 'BIN_NAME' tem como pre-requisito a macro 'OBJ' e seus arquivos
 ./bin/${BIN_NAME}: ${OBJ}
-	@ ${CPL} $^ -o $@
+	@ ${CPL} $^  ${GL_FLAGS} -o $@
 	@ echo " \033[0;33m  Criando binario \033[43;1;37m$@\033[0m\033[0;33m  \033[0m "
 	@ echo ''
 # $@ nome do target, $^ todos os pre-requisitos, $< primeiro pre-equisito
@@ -66,7 +66,7 @@ objectFolder:
 
 # o target '%.o' pega o 'stem' (tronco do nome, sem extensao) e o utiliza como referencia no pre-requisito
 ./object/%.o: ./source/%.cpp ./include/%.h
-	@ ${CPL} $< ${CPP_FLAGS} -c ${C_FLAGS} -I ./include -o $@
+	@ ${CPL} $< -c ${CPL_FLAGS} -I ./include -o $@
 	@ echo " \033[0;35m  Gerando objeto de compilacao \033[45;1;37m$@\033[0m\033[0;35m  \033[0m "
 	@ echo ''
 # @ oculta linha
@@ -74,7 +74,7 @@ objectFolder:
 
 # main e compilado aqui pois nao atende os pre-requisitos para o target anterior
 ./object/main.o: ./source/main.cpp ${H_SOURCE}
-	@ ${CPL} $< ${CPP_FLAGS} -c ${C_FLAGS} -I ./include -o $@
+	@ ${CPL} $< -c ${CPL_FLAGS} -I ./include -o $@
 	@ echo " \033[0;34m  Gerando objeto de compilacao \033[44;1;37m$@\033[0m\033[0;34m  \033[0m "
 	@ echo ''
 # -o gera o objeto de compilação como output, -I inclui as bibliotecas do diretorio selecionado a fim de evitar que o #include dos codigos necessitem navegar pelo patch
