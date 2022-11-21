@@ -37,3 +37,21 @@ const string Utils::parseTimeToString(const time_t time)
 
 	return string(strDate);
 }
+
+const float _scaleRGBValues(float value)
+{
+	return value / 255.0;
+}
+float *Utils::getColorArrayByColorName(const string colorName)
+{
+	static float colorArray[3] = {0.0, 0.0, 0.0}; // BLACK_COLOR
+
+	if (colorName == BLUE_COLOR)
+	{
+		colorArray[0] = _scaleRGBValues(0);
+		colorArray[1] = _scaleRGBValues(0);
+		colorArray[2] = _scaleRGBValues(255);
+	}
+
+	return colorArray;
+}

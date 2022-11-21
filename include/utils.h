@@ -8,6 +8,14 @@
 
 using namespace std;
 
+#define RED_COLOR "red"
+#define GREEN_COLOR "green"
+#define BLUE_COLOR "blue"
+#define YELLOW_COLOR "yellow"
+#define PURPLE_COLOR "purple"
+#define BLACK_COLOR "black"
+#define WHITE_COLOR "white"
+
 class Utils
 {
 public:
@@ -18,6 +26,8 @@ public:
 	// ? Member Functions
 	time_t parseStringToTime(const char *strDate);
 	const string parseTimeToString(const time_t time);
+
+	float *getColorArrayByColorName(const string colorName);
 };
 
 #endif // UTILS_H
