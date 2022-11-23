@@ -26,7 +26,8 @@ VALGRIND_FLAGS=-s \
                --leak-check=full \
                --show-leak-kinds=all \
                --track-origins=yes \
-               --verbose
+               --verbose \
+               --log-file=logs/valgrind.log
 
 
 
@@ -39,7 +40,7 @@ run: all
 # target 'valgrind' feito para verificar vazamentos de memoria no programa
 valgrind: all
 	@ clear
-	@ valgrind ${VALGRIND_FLAGS} ./bin/${BIN_NAME}
+	@ valgrind ${VALGRIND_FLAGS} ./bin/${BIN_NAME} ./assets/arena_1.svg
 
 
 # o target 'all' tem como pre-requisito a variavel 'BIN_NAME' e a variavel 'objectFolder', que se tornam targets
@@ -53,6 +54,7 @@ all: objectFolder ./bin/${BIN_NAME}
 objectFolder:
 	@ mkdir -p object
 	@ mkdir -p bin
+	@ mkdir -p logs
 # -p nao gera erro caso ja exista
 
 
@@ -82,7 +84,7 @@ objectFolder:
 
 # o target 'clean' nao tem como pre-requisito, serve para remover arquivos residuais
 clean:
-	@ rm -rf ./object/*.o *~ ./bin/${BIN_NAME}
+	@ rm -rf ./logs ./object/*.o *~ ./bin/${BIN_NAME}
 	@ rmdir object bin
 	@ echo " \033[1;31m  Removendo binario \033[41;1;37m./bin/${BIN_NAME}\033[0m\033[1;31m e objetos de compilacao \033[41;1;37m${OBJ}\033[0m\033[1;31m e arquivos de backup  \033[0m "
 	@ echo ''
