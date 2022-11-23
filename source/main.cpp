@@ -12,21 +12,22 @@
 #include "../include/tinyxml2.h"
 #include "../include/utils.h"
 #include "../include/arena.h"
-// #include "../include/player.h"
+#include "../include/player.h"
 
 using namespace std;
 using namespace tinyxml2;
 
-#define WINDOW_WIDTH 1200
-#define WINDOW_HEIGHT 600
+#define WINDOW_DEFAULT_SIZE 600
 #define INC_KEY 1
 #define INC_KEYIDLE 2.0
 
-const float viewingWidth = float(WINDOW_WIDTH) - 200.0;
-const float viewingHeight = float(WINDOW_HEIGHT) - 200.0;
+float viewingWidth = float(WINDOW_DEFAULT_SIZE) - 200.0;
+float viewingHeight = float(WINDOW_DEFAULT_SIZE) - 200.0;
 int keyStatus[256];
 int animate = 0;
 Arena arena = Arena();
+Player opponent = Player();
+Player player = Player();
 
 void resetKeyStatus()
 {
@@ -92,7 +93,9 @@ void display(void)
 	// clear display buffer for all pixels
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	arena.render(viewingWidth, viewingHeight);
+	arena.render();
+	player.render();
+	opponent.render();
 
 	// drawn on frame buffer
 	glutSwapBuffers();
@@ -102,21 +105,22 @@ void idle(void)
 {
 	float inc = INC_KEYIDLE;
 
+	// player movement
 	if (keyStatus[(int)('w')])
 	{
-		arena.setPosY(arena.getPosY() + inc);
+		player.setPosY(player.getPosY() + inc);
 	}
 	if (keyStatus[(int)('s')])
 	{
-		arena.setPosY(arena.getPosY() - inc);
+		player.setPosY(player.getPosY() - inc);
 	}
 	if (keyStatus[(int)('a')])
 	{
-		arena.setPosX(arena.getPosX() - inc);
+		player.setPosX(player.getPosX() - inc);
 	}
 	if (keyStatus[(int)('d')])
 	{
-		arena.setPosX(arena.getPosX() + inc);
+		player.setPosX(player.getPosX() + inc);
 	}
 
 	// treat collisons
@@ -143,9 +147,9 @@ void init(int argc, char *argv[])
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 
 	// view window initialization
-	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT); // declares window size
+	glutInitWindowSize(viewingWidth, viewingHeight); // declares window size
 	glutInitWindowPosition(100, 100);								 // declares window position
-	glutCreateWindow("Fight");											 // create window with name
+	glutCreateWindow("Fight");											 // create window with title
 
 	registerCallbacks();
 	resetKeyStatus();
@@ -154,11 +158,11 @@ void init(int argc, char *argv[])
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // set background color as black, no opacity(alpha)
 	glMatrixMode(GL_PROJECTION);					// select the projection matrix
 	glOrtho(0.0,													// X coordinate of left edge
-					0.0,													// X coordinate of right edge
+					viewingWidth,									// X coordinate of right edge
 					0.0,													// Y coordinate of bottom edge
-					0.0,													// Y coordinate of top edge
-					-1.0,													// Z coordinate of the 'near' plane
-					1.0);													// Z coordinate of the 'far' plane
+					viewingHeight,								// Y coordinate of top edge
+					1.0,													// Z coordinate of the 'near' plane
+					-1.0);												// Z coordinate of the 'far' plane
 	glMatrixMode(GL_MODELVIEW);						// select the projection matrix
 	glLoadIdentity();											// load identity matrix
 }
@@ -200,6 +204,7 @@ int main(int argc, char *argv[])
 		XMLElement *playerOnePosition = arenaBackground->NextSiblingElement();
 		XMLElement *playerTwoPosition = playerOnePosition->NextSiblingElement();
 
+		// load arena attributes
 		arena.setPosX(atof(arenaBackground->Attribute("x")));
 		arena.setPosY(atof(arenaBackground->Attribute("y")));
 		arena.setWidth(atof(arenaBackground->Attribute("width")));
@@ -207,7 +212,24 @@ int main(int argc, char *argv[])
 		arena.setColor(
 				util.getColorArrayByColorName(arenaBackground->Attribute("fill")));
 
+		// load player attributes
+		player.setPosX(atof(playerOnePosition->Attribute("cx")));
+		player.setPosY(atof(playerOnePosition->Attribute("cy")));
+		player.setRadius(atof(playerOnePosition->Attribute("r")));
+		player.setColor(
+				util.getColorArrayByColorName(playerOnePosition->Attribute("fill")));
+
+		// load opponent attributes
+		opponent.setPosX(atof(playerTwoPosition->Attribute("cx")));
+		opponent.setPosY(atof(playerTwoPosition->Attribute("cy")));
+		opponent.setRadius(atof(playerTwoPosition->Attribute("r")));
+		opponent.setColor(
+				util.getColorArrayByColorName(playerTwoPosition->Attribute("fill")));
+
 		delete arenaFile;
+
+		viewingWidth = arena.getWidth();
+		viewingHeight = arena.getHeight();
 
 		init(argc, argv);
 

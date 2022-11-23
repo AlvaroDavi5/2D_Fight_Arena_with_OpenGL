@@ -21,20 +21,25 @@ Arena::~Arena()
 	//// do nothing
 }
 
-void Arena::render(float windowWidth, float windowHeight)
+void _drawnRectangle(float x, float y, float w, float h, float R, float G, float B)
+{
+	glColor3f(R, G, B);
+	glBegin(GL_POLYGON);
+	glVertex2f(x, y);
+	glVertex2f(x, y + h);
+	glVertex2f(x + w, y + h);
+	glVertex2f(x + w, y);
+	glEnd();
+}
+
+void Arena::render()
 {
 	const float *arenaColor = this->getColor();
-	const float arenaPosX = (this->getPosX() / windowWidth),
-							arenaPosY = (this->getPosY() / windowHeight),
-							arenaWidth = (this->getWidth() / windowWidth),
-							arenaHeight = (this->getHeight() / windowHeight);
-	glColor3f(arenaColor[0], arenaColor[1], arenaColor[2]);
-	glBegin(GL_POLYGON);
-	glVertex2f(arenaPosX, arenaPosY);
-	glVertex2f(arenaPosX, arenaPosY + arenaHeight);
-	glVertex2f(arenaPosX + arenaWidth, arenaPosY + arenaHeight);
-	glVertex2f(arenaPosX + arenaWidth, arenaPosY);
-	glEnd();
+
+	_drawnRectangle(
+			this->getPosX(), this->getPosY(),
+			this->getWidth(), this->getHeight(),
+			arenaColor[0], arenaColor[1], arenaColor[2]);
 }
 
 float *Arena::getColor()

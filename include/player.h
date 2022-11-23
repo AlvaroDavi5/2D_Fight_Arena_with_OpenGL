@@ -1,29 +1,30 @@
-#ifndef ARENA_H
+#ifndef PLAYER_H
 
-#define ARENA_H
+#define PLAYER_H
 
 #include <iostream>
+#include <math.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
 
 using namespace std;
 
-class Arena
+class Player
 {
 private:
 	float posX = 0.0;
 	float posY = 0.0;
-	float width = 0.0;
-	float height = 0.0;
+	float bodyRadius = 0.0;
 	float color[3] = {0.0f, 0.0f, 0.0f};
+	bool wasCollision = false;
 
 public:
 	// ! Constructor(s) and Destructor
-	Arena();
-	Arena(float x, float y);
-	Arena(float x, float y, float w, float h);
-	~Arena();
+	Player();
+	Player(float x, float y);
+	Player(float x, float y, float r);
+	~Player();
 
 	// ? Member Functions
 	void render();
@@ -36,10 +37,11 @@ public:
 	const float getPosY();
 	void setPosY(const float y);
 
-	const float getWidth();
-	void setWidth(const float w);
-	const float getHeight();
-	void setHeight(const float h);
+	const float getRadius();
+	void setRadius(const float r);
+
+	const bool getCollision();
+	void setCollision(const bool collide);
 };
 
-#endif // ARENA_H
+#endif // PLAYER_H
