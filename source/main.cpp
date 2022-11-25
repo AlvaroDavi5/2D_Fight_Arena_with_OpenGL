@@ -116,16 +116,16 @@ void idle(void)
 	}
 	if (keyStatus[(int)('a')])
 	{
-		player.setPosX(player.getPosX() - inc);
+		player.setAngle(player.getAngle() - inc);
 	}
 	if (keyStatus[(int)('d')])
 	{
-		player.setPosX(player.getPosX() + inc);
+		player.setAngle(player.getAngle() + inc);
 	}
 
-	// treat collisons
+	// TODO - treat collisons
 
-	// control animation
+	// TODO - control animation
 
 	glutPostRedisplay();
 }

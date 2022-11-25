@@ -7,14 +7,18 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+#include "./utils.h"
+
+#define SHOW_PLAYER_CIRCLE true
 
 using namespace std;
 
 class Player
 {
 private:
-	float posX = 0.0;
-	float posY = 0.0;
+	float angle = 0.0;
+	float posX = 0.0, posY = 0.0;
+	float facePosX = 0.0, facePosY = 0.0;
 	float bodyRadius = 0.0;
 	float color[3] = {0.0f, 0.0f, 0.0f};
 	bool wasCollision = false;
@@ -37,6 +41,8 @@ public:
 	const float getPosY();
 	void setPosY(const float y);
 
+	const float getAngle();
+	void setAngle(const float t);
 	const float getRadius();
 	void setRadius(const float r);
 

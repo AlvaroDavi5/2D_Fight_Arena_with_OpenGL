@@ -88,6 +88,12 @@ float *Utils::getColorArrayByColorName(const string colorName)
 		colorArray[1] = _scaleRGBValues(255);
 		colorArray[2] = _scaleRGBValues(255);
 	}
+	if (colorName == BEIGE_COLOR)
+	{
+		colorArray[0] = _scaleRGBValues(255);
+		colorArray[1] = _scaleRGBValues(200);
+		colorArray[2] = _scaleRGBValues(168);
+	}
 
 	return colorArray;
 }

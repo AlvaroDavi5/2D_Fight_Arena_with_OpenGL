@@ -15,6 +15,7 @@ using namespace std;
 #define PURPLE_COLOR "purple"
 #define BLACK_COLOR "black"
 #define WHITE_COLOR "white"
+#define BEIGE_COLOR "beige"
 
 class Utils
 {
