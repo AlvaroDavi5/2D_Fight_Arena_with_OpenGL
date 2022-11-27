@@ -28,7 +28,7 @@ public:
 	time_t parseStringToTime(const char *strDate);
 	const string parseTimeToString(const time_t time);
 
-	float *getColorArrayByColorName(const string colorName);
+	void setColorArrayByColorName(const string colorName, float colorArray[]);
 };
 
 #endif // UTILS_H

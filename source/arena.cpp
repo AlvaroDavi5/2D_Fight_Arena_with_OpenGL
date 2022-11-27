@@ -21,7 +21,7 @@ Arena::~Arena()
 	//// do nothing
 }
 
-void _drawnRect(float x, float y, float w, float h, float R, float G, float B)
+void _drawRect(float x, float y, float w, float h, float R, float G, float B)
 {
 	glColor3f(R, G, B);
 	glBegin(GL_POLYGON);
@@ -36,7 +36,7 @@ void Arena::render()
 {
 	const float *arenaColor = this->getColor();
 
-	_drawnRect(
+	_drawRect(
 			this->getPosX(), this->getPosY(),
 			this->getWidth(), this->getHeight(),
 			arenaColor[0], arenaColor[1], arenaColor[2]);

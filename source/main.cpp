@@ -18,13 +18,15 @@ using namespace std;
 using namespace tinyxml2;
 
 #define WINDOW_DEFAULT_SIZE 600
-#define INC_KEY 1
-#define INC_KEYIDLE 2.0
+#define MOVE_INC_KEY 2.0
+#define ROTATE_INC_KEY 1.0
+#define PUNCH_INC_KEY 0.1
 
 float viewingWidth = float(WINDOW_DEFAULT_SIZE) - 200.0;
 float viewingHeight = float(WINDOW_DEFAULT_SIZE) - 200.0;
 int keyStatus[256];
 int animate = 0;
+
 Arena arena = Arena();
 Player opponent = Player();
 Player player = Player();
@@ -52,7 +54,7 @@ void keyPress(unsigned char key, int x, int y)
 		break;
 	case 'w':
 	case 'W':
-		keyStatus[(int)('w')] = 1;
+		keyStatus[(int)('w')] = 1; // using keyStatus trick
 		break;
 	case 's':
 	case 'S':
@@ -75,6 +77,8 @@ void keyPress(unsigned char key, int x, int y)
 
 void mouseMove(int x, int y)
 {
+	// REVIEW - update action
+
 	float gX = 0.0, gY = 0.0, s = 1.0;
 	float posX = 0.0, posY = 0.0;
 
@@ -97,33 +101,34 @@ void display(void)
 	player.render();
 	opponent.render();
 
-	// drawn on frame buffer
+	// draw on frame buffer
 	glutSwapBuffers();
 }
 
 void idle(void)
 {
-	float inc = INC_KEYIDLE;
-
 	// player movement
 	if (keyStatus[(int)('w')])
 	{
-		player.setPosY(player.getPosY() + inc);
+		player.move(+MOVE_INC_KEY);
 	}
 	if (keyStatus[(int)('s')])
 	{
-		player.setPosY(player.getPosY() - inc);
+		player.move(-MOVE_INC_KEY);
 	}
+	// player rotation
 	if (keyStatus[(int)('a')])
 	{
-		player.setAngle(player.getAngle() - inc);
+		player.rotate(+ROTATE_INC_KEY);
 	}
 	if (keyStatus[(int)('d')])
 	{
-		player.setAngle(player.getAngle() + inc);
+		player.rotate(-ROTATE_INC_KEY);
 	}
 
 	// TODO - treat collisons
+
+	// TODO - treat punch
 
 	// TODO - control animation
 
@@ -209,22 +214,19 @@ int main(int argc, char *argv[])
 		arena.setPosY(atof(arenaBackground->Attribute("y")));
 		arena.setWidth(atof(arenaBackground->Attribute("width")));
 		arena.setHeight(atof(arenaBackground->Attribute("height")));
-		arena.setColor(
-				util.getColorArrayByColorName(arenaBackground->Attribute("fill")));
+		util.setColorArrayByColorName(arenaBackground->Attribute("fill"), arena.getColor());
 
 		// load player attributes
 		player.setPosX(atof(playerOnePosition->Attribute("cx")));
 		player.setPosY(atof(playerOnePosition->Attribute("cy")));
 		player.setRadius(atof(playerOnePosition->Attribute("r")));
-		player.setColor(
-				util.getColorArrayByColorName(playerOnePosition->Attribute("fill")));
+		util.setColorArrayByColorName(playerOnePosition->Attribute("fill"), player.getColor());
 
 		// load opponent attributes
 		opponent.setPosX(atof(playerTwoPosition->Attribute("cx")));
 		opponent.setPosY(atof(playerTwoPosition->Attribute("cy")));
 		opponent.setRadius(atof(playerTwoPosition->Attribute("r")));
-		opponent.setColor(
-				util.getColorArrayByColorName(playerTwoPosition->Attribute("fill")));
+		util.setColorArrayByColorName(playerTwoPosition->Attribute("fill"), opponent.getColor());
 
 		delete arenaFile;
 

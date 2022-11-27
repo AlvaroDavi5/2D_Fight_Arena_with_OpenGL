@@ -33,6 +33,9 @@ public:
 	// ? Member Functions
 	void render();
 
+	void move(float inc);
+	void rotate(float inc);
+
 	float *getColor();
 	void setColor(float colorArray[]);
 
