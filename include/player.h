@@ -9,7 +9,8 @@
 #include <GL/glut.h>
 #include "./utils.h"
 
-#define SHOW_PLAYER_CIRCLE true
+#define SHOW_COLLISION_CIRCLE true
+#define DEFAULT_ARM_INCLINATION 15.0
 
 using namespace std;
 
@@ -18,10 +19,11 @@ class Player
 private:
 	float angle = 0.0;
 	float posX = 0.0, posY = 0.0;
-	float facePosX = 0.0, facePosY = 0.0;
 	float bodyRadius = 0.0;
-	float color[3] = {0.0f, 0.0f, 0.0f};
+	float color[3] = {0.0, 0.0, 0.0};
 	bool wasCollision = false;
+	float leftArmAngle[2] = {0.0, 0.0};
+	float rightArmAngle[2] = {0.0, 0.0};
 
 public:
 	// ! Constructor(s) and Destructor
@@ -48,6 +50,9 @@ public:
 	void setAngle(const float t);
 	const float getRadius();
 	void setRadius(const float r);
+
+	void setLeftArmAngle(float radianAngle, float degreeAngle);
+	void setRightArmAngle(float radianAngle, float degreeAngle);
 
 	const bool getCollision();
 	void setCollision(const bool collide);
