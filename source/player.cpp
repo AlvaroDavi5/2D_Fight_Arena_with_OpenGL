@@ -122,7 +122,7 @@ void _transformSegment(float rx, float ry, float dx, float dy, float t, float &x
 			xOut, yOut);
 }
 
-void _renderArm(float pos[], float radius, float armsAngles[], float armsWidths[], float armsHeights[], float color[], bool invert)
+void _renderArm(float pos[], float radius, float playerAngle, float armsAngles[], float armsWidths[], float armsHeights[], float color[], float handColor[], bool invert)
 {
 	float armAngle = armsAngles[0], foreArmAngle = armsAngles[1];
 	float armWidth = armsWidths[0], foreArmWidth = armsWidths[1];
@@ -136,9 +136,8 @@ void _renderArm(float pos[], float radius, float armsAngles[], float armsWidths[
 
 	// arm
 	float armStartPos[2] = {0.0, radius};
-	_transformSegment(
-			armStartPos[0], armStartPos[1],
-			0.0, 0.0, armAngle,
+	_rotatePoint(
+			armStartPos[0], armStartPos[1], playerAngle,
 			armStartPos[0], armStartPos[1]);
 
 	float armP1[2] = {0.0, 0.0};
@@ -202,6 +201,19 @@ void _renderArm(float pos[], float radius, float armsAngles[], float armsWidths[
 			color);
 
 	// hand
+	const float handRadius = radius / 4.0f;
+	float handInitPos[2] = {
+			(foreArmP2[0] - foreArmP3[0]) + foreArmP3[0],
+			(foreArmP2[1] - foreArmP3[1]) + foreArmP3[1]};
+	float handPos[2] = {handRadius, 0.0};
+	_transformSegment(
+			handPos[0], handPos[1],
+			handInitPos[0], handInitPos[1], defaultAngle,
+			handPos[0], handPos[1]);
+
+	_drawCircle(
+			handPos, handRadius,
+			GL_TRIANGLE_FAN, handColor);
 }
 
 void Player::render()
@@ -232,19 +244,19 @@ void Player::render()
 
 	_renderArm(
 			playerPos, playerRadius,
-			leftArmAngle,
+			playerAngle, leftArmAngle,
 			armsWidths, armsHeights,
-			skinColor, false);
+			skinColor, playerColor, false);
 	_renderArm(
 			playerPos, playerRadius,
-			rightArmAngle,
+			playerAngle, rightArmAngle,
 			armsWidths, armsHeights,
-			skinColor, true);
+			skinColor, playerColor, true);
 
 	if (SHOW_COLLISION_CIRCLE)
 	{
 		_drawCircle(
-				playerPos, armHeight + playerRadius,
+				playerPos, (armHeight * 1.5f) + playerRadius,
 				GL_LINE_LOOP, defaultColor);
 	}
 }
@@ -359,12 +371,12 @@ void Player::setRadius(const float r)
 void Player::setLeftArmAngle(float radianAngle, float degreeAngle)
 {
 	this->leftArmAngle[0] = radianAngle + _degreeToRadian(degreeAngle) + _degreeToRadian(DEFAULT_ARM_INCLINATION);
-	this->leftArmAngle[1] = radianAngle;
+	this->leftArmAngle[1] = radianAngle + (_degreeToRadian(degreeAngle) / 2.0);
 }
 void Player::setRightArmAngle(float radianAngle, float degreeAngle)
 {
 	this->rightArmAngle[0] = radianAngle - _degreeToRadian(degreeAngle) - _degreeToRadian(DEFAULT_ARM_INCLINATION);
-	this->rightArmAngle[1] = radianAngle;
+	this->rightArmAngle[1] = radianAngle - (_degreeToRadian(degreeAngle) / 2.0);
 }
 
 const bool Player::getCollision()
