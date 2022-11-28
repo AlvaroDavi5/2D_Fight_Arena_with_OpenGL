@@ -21,11 +21,13 @@ using namespace tinyxml2;
 #define MOVE_INC_KEY 2.0
 #define ROTATE_INC_KEY 1.0
 #define PUNCH_INC_KEY 0.1
+#define ARM_ROTATE_ANGLE 60.0
 
 float viewingWidth = float(WINDOW_DEFAULT_SIZE) - 200.0;
 float viewingHeight = float(WINDOW_DEFAULT_SIZE) - 200.0;
 int keyStatus[256];
-int animate = 0;
+float mousePosXVect[2] = {0.0, 0.0};
+bool mouseFree = false;
 
 Arena arena = Arena();
 Player opponent = Player();
@@ -49,9 +51,6 @@ void keyPress(unsigned char key, int x, int y)
 {
 	switch (key)
 	{
-	case ' ':
-		animate = !animate;
-		break;
 	case 'w':
 	case 'W':
 		keyStatus[(int)('w')] = 1; // using keyStatus trick
@@ -75,19 +74,33 @@ void keyPress(unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 
+void mouseControl(int button, int state, int x, int y)
+{
+	mouseFree = bool(state);
+	float posX = float(x) / viewingWidth;
+
+	if (!mouseFree)
+	{
+		mousePosXVect[0] = posX;
+	}
+}
 void mouseMove(int x, int y)
 {
-	// REVIEW - update action
+	const float playerAngle = player.getAngle();
+	float posX = float(x) / viewingWidth;
 
-	float gX = 0.0, gY = 0.0, s = 1.0;
-	float posX = 0.0, posY = 0.0;
+	mousePosXVect[1] = posX;
+	float interval = mousePosXVect[1] - mousePosXVect[0];
+	bool viewingWidthHasExceded = abs(interval * viewingWidth) >= abs(viewingWidth);
 
-	y = viewingWidth - y;
-	posX = float(x) / float(viewingWidth);
-	posY = float(y) / float(viewingWidth);
-
-	gX = (s * posX) + s * (-0.5);
-	gY = (s * posY) + s * (-0.5);
+	if (interval > 0.0 && !viewingWidthHasExceded)
+	{
+		player.setRightArmAngle(playerAngle, -interval * ARM_ROTATE_ANGLE);
+	}
+	else if (interval < 0.0 && !viewingWidthHasExceded)
+	{
+		player.setLeftArmAngle(playerAngle, interval * ARM_ROTATE_ANGLE);
+	}
 
 	glutPostRedisplay();
 }
@@ -107,30 +120,41 @@ void display(void)
 
 void idle(void)
 {
+	const float playerAngle = player.getAngle();
+	bool moved = false;
+
 	// player movement
 	if (keyStatus[(int)('w')])
 	{
 		player.move(+MOVE_INC_KEY);
+		moved = true;
 	}
 	if (keyStatus[(int)('s')])
 	{
 		player.move(-MOVE_INC_KEY);
+		moved = true;
 	}
 	// player rotation
 	if (keyStatus[(int)('a')])
 	{
 		player.rotate(+ROTATE_INC_KEY);
+		moved = true;
 	}
 	if (keyStatus[(int)('d')])
 	{
 		player.rotate(-ROTATE_INC_KEY);
+		moved = true;
+	}
+
+	if (mouseFree || moved)
+	{
+		player.setLeftArmAngle(playerAngle, 0.0);
+		player.setRightArmAngle(playerAngle, 0.0);
 	}
 
 	// TODO - treat collisons
 
 	// TODO - treat punch
-
-	// TODO - control animation
 
 	glutPostRedisplay();
 }
@@ -141,6 +165,7 @@ void registerCallbacks()
 	glutReshapeFunc(NULL);
 	glutKeyboardFunc(keyPress);
 	glutKeyboardUpFunc(keyUp);
+	glutMouseFunc(mouseControl);
 	glutMotionFunc(mouseMove);
 	glutIdleFunc(idle);
 }
