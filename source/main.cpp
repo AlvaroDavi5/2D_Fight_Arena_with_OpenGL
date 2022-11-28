@@ -156,6 +156,8 @@ void idle(void)
 
 	// TODO - treat punch
 
+	// TODO - move opponent
+
 	glutPostRedisplay();
 }
 
@@ -178,7 +180,7 @@ void init(int argc, char *argv[])
 
 	// view window initialization
 	glutInitWindowSize(viewingWidth, viewingHeight); // declares window size
-	glutInitWindowPosition(100, 100);								 // declares window position
+	glutInitWindowPosition(100.0, 100.0);								 // declares window position
 	glutCreateWindow("Fight");											 // create window with title
 
 	registerCallbacks();
@@ -255,8 +257,15 @@ int main(int argc, char *argv[])
 
 		delete arenaFile;
 
+		// adjust positions
 		viewingWidth = arena.getWidth();
 		viewingHeight = arena.getHeight();
+		player.setPosX(player.getPosX() - arena.getPosX());
+		player.setPosY(player.getPosY() - arena.getPosY());
+		opponent.setPosX(opponent.getPosX() - arena.getPosX());
+		opponent.setPosY(opponent.getPosY() - arena.getPosY());
+		arena.setPosX(0.0);
+		arena.setPosY(0.0);
 
 		init(argc, argv);
 

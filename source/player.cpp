@@ -122,7 +122,10 @@ void _transformSegment(float rx, float ry, float dx, float dy, float t, float &x
 			xOut, yOut);
 }
 
-void _renderArm(float pos[], float radius, float playerAngle, float armsAngles[], float armsWidths[], float armsHeights[], float color[], float handColor[], bool invert)
+void _renderArm(
+		float pos[], float radius, float playerAngle,
+		float armsAngles[], float armsWidths[], float armsHeights[],
+		float color[], float handColor[], float *handPos, bool invert)
 {
 	float armAngle = armsAngles[0], foreArmAngle = armsAngles[1];
 	float armWidth = armsWidths[0], foreArmWidth = armsWidths[1];
@@ -201,11 +204,13 @@ void _renderArm(float pos[], float radius, float playerAngle, float armsAngles[]
 			color);
 
 	// hand
-	float handPos[2] = {foreArmP3[0], foreArmP3[1]};
+	float handPosition[2] = {foreArmP3[0], foreArmP3[1]};
 	float handRadius = radius / 2.0f;
 
+	handPos[0] = handPosition[0];
+	handPos[1] = handPosition[1];
 	_drawCircle(
-			handPos, handRadius,
+			handPosition, handRadius,
 			GL_TRIANGLE_FAN, handColor);
 }
 
@@ -239,17 +244,18 @@ void Player::render()
 			playerPos, playerRadius,
 			playerAngle, leftArmAngle,
 			armsWidths, armsHeights,
-			skinColor, playerColor, false);
+			skinColor, playerColor, this->leftHandPos, false);
 	_renderArm(
 			playerPos, playerRadius,
 			playerAngle, rightArmAngle,
 			armsWidths, armsHeights,
-			skinColor, playerColor, true);
+			skinColor, playerColor, this->rightHandPos, true);
 
+	this->playerRadius = (armHeight * 1.5f) + playerRadius;
 	if (SHOW_COLLISION_CIRCLE)
 	{
 		_drawCircle(
-				playerPos, (armHeight * 1.5f) + playerRadius,
+				playerPos, this->playerRadius,
 				GL_LINE_LOOP, defaultColor);
 	}
 }

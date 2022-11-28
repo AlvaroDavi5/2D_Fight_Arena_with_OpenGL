@@ -17,22 +17,26 @@ using namespace std;
 class Player
 {
 private:
+	// * Attributes
 	float angle = 0.0;
 	float posX = 0.0, posY = 0.0;
-	float bodyRadius = 0.0;
+	float bodyRadius = 0.0, playerRadius = 0.0;
 	float color[3] = {0.0, 0.0, 0.0};
 	bool wasCollision = false;
 	float leftArmAngle[2] = {0.0, 0.0};
 	float rightArmAngle[2] = {0.0, 0.0};
+	float leftHandPos[2] = {0.0, 0.0};
+	float rightHandPos[2] = {0.0, 0.0};
+	// // private methods
 
 public:
-	// ! Constructor(s) and Destructor
+	// ! Constructor(s) and Destructor Methods
 	Player();
 	Player(float x, float y);
 	Player(float x, float y, float r);
 	~Player();
 
-	// ? Member Functions
+	// ? Member Functions (Methods)
 	void render();
 
 	void move(float inc);
