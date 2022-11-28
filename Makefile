@@ -42,6 +42,9 @@ valgrind: all
 	@ clear
 	@ valgrind ${VALGRIND_FLAGS} ./bin/${BIN_NAME} ./assets/arena_1.svg
 
+# target 'mangohud' feito para verificar estatisiticas de renderizacao
+mangohud: all
+	@ mangohud  ./bin/${BIN_NAME} ./assets/arena_1.svg
 
 # o target 'all' tem como pre-requisito a variavel 'BIN_NAME' e a variavel 'objectFolder', que se tornam targets
 all: objectFolder ./bin/${BIN_NAME}
