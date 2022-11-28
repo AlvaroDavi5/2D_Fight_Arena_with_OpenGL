@@ -201,15 +201,8 @@ void _renderArm(float pos[], float radius, float playerAngle, float armsAngles[]
 			color);
 
 	// hand
-	const float handRadius = radius / 4.0f;
-	float handInitPos[2] = {
-			(foreArmP2[0] - foreArmP3[0]) + foreArmP3[0],
-			(foreArmP2[1] - foreArmP3[1]) + foreArmP3[1]};
-	float handPos[2] = {handRadius, 0.0};
-	_transformSegment(
-			handPos[0], handPos[1],
-			handInitPos[0], handInitPos[1], defaultAngle,
-			handPos[0], handPos[1]);
+	float handPos[2] = {foreArmP3[0], foreArmP3[1]};
+	float handRadius = radius / 2.0f;
 
 	_drawCircle(
 			handPos, handRadius,
