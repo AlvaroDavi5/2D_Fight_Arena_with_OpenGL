@@ -30,7 +30,7 @@ private:
 	float rightHandPos[2] = {0.0, 0.0};
 	Player *opponent = NULL;
 	// // Private Methods
-	bool collidedWithOpponent(char coordinate, bool invertRadius);
+	bool collidedWithOpponent(bool invertRadius);
 
 public:
 	// ! Constructor(s) and Destructor Methods
@@ -67,6 +67,8 @@ public:
 
 	Player *getOpponent();
 	void setOpponent(Player *opponent);
+
+	void goTo(float x, float y, float incMove, float incAngle);
 };
 
 #endif // PLAYER_H

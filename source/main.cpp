@@ -152,11 +152,15 @@ void idle(void)
 		player.setRightArmAngle(playerAngle, 0.0);
 	}
 
-	// TODO - treat collisons
+	if (opponent.getPosX() != player.getPosX() ||
+			opponent.getPosY() != player.getPosY())
+	{
+		opponent.goTo(
+				player.getPosX(), player.getPosY(),
+				(MOVE_INC_KEY / 2.0), ROTATE_INC_KEY);
+	}
 
 	// TODO - treat punch
-
-	// TODO - move opponent
 
 	glutPostRedisplay();
 }
@@ -270,6 +274,7 @@ int main(int argc, char *argv[])
 		opponent.setPosY(opponent.getPosY() - arena.getPosY());
 		opponent.setLimits(arena.getWidth(), arena.getHeight());
 		opponent.setOpponent(&player);
+		opponent.rotate(180.0);
 
 		arena.setPosX(0.0);
 		arena.setPosY(0.0);

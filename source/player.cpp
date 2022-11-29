@@ -259,7 +259,7 @@ void Player::render()
 	}
 }
 
-bool Player::collidedWithOpponent(char coordinate, bool invertRadius)
+bool Player::collidedWithOpponent(bool invertRadius)
 {
 	Player *opponent = this->getOpponent();
 	if (opponent == NULL)
@@ -291,12 +291,8 @@ bool Player::collidedWithOpponent(char coordinate, bool invertRadius)
 			opponent->getPosX(), opponent->getPosY(),
 			target[0], target[1]);
 
-	if (coordinate == 'X')
-		return dir[0] >= target[0];
-	if (coordinate == 'Y')
-		return dir[1] >= target[1];
-
-	return false;
+	// TODO - fix player collision
+	return (dir[0] >= target[0]) && (dir[0] < opponent->getPosX());
 }
 
 void Player::move(float inc)
@@ -312,13 +308,13 @@ void Player::move(float inc)
 
 	if ((playerPos[0] - playerRadius) > 0 &&
 			(playerPos[0] + playerRadius) < this->maxPos[0] &&
-			!this->collidedWithOpponent('X', invertRadius))
+			!this->collidedWithOpponent(invertRadius))
 	{
 		this->setPosX(playerPos[0]);
 	}
 	if ((playerPos[1] - playerRadius) > 0 &&
 			(playerPos[1] + playerRadius) < this->maxPos[1] &&
-			!this->collidedWithOpponent('Y', invertRadius))
+			!this->collidedWithOpponent(invertRadius))
 	{
 		this->setPosY(playerPos[1]);
 	}
@@ -343,6 +339,28 @@ void Player::rotate(float inc)
 	}
 
 	this->setAngle(dirAngle);
+}
+void Player::goTo(float x, float y, float incMove, float incAngle)
+{
+	float newAngle = _degreeToRadian(_radianToDegree(this->getAngle()) + incAngle);
+
+	float dirVect[2] = {this->getRadius(), 0.0};
+	_rotatePoint(
+			dirVect[0], dirVect[1],
+			newAngle, dirVect[0], dirVect[1]);
+
+	float dirVectNorm = sqrt(pow(dirVect[0], 2) + pow(dirVect[1], 2));
+	float unitVect[2] = {
+			dirVect[0] / dirVectNorm,
+			dirVect[1] / dirVectNorm};
+	float dirAngle = atan2(unitVect[1], unitVect[0]);
+	if (isnan(dirAngle))
+	{
+		dirAngle = _degreeToRadian(90.0);
+	}
+
+	this->setAngle(dirAngle);
+	this->move(incMove);
 }
 
 float *Player::getColor()
