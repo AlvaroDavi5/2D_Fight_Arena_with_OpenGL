@@ -20,14 +20,17 @@ private:
 	// * Attributes
 	float angle = 0.0;
 	float posX = 0.0, posY = 0.0;
-	float bodyRadius = 0.0, playerRadius = 0.0;
+	float maxPos[2] = {0.0, 0.0};
+	float bodyRadius = 0.0;
 	float color[3] = {0.0, 0.0, 0.0};
 	bool wasCollision = false;
 	float leftArmAngle[2] = {0.0, 0.0};
 	float rightArmAngle[2] = {0.0, 0.0};
 	float leftHandPos[2] = {0.0, 0.0};
 	float rightHandPos[2] = {0.0, 0.0};
-	// // private methods
+	Player *opponent = NULL;
+	// // Private Methods
+	bool collidedWithOpponent(char coordinate, bool invertRadius);
 
 public:
 	// ! Constructor(s) and Destructor Methods
@@ -49,6 +52,7 @@ public:
 	void setPosX(const float x);
 	const float getPosY();
 	void setPosY(const float y);
+	void setLimits(const float x, const float y);
 
 	const float getAngle();
 	void setAngle(const float t);
@@ -60,6 +64,9 @@ public:
 
 	const bool getCollision();
 	void setCollision(const bool collide);
+
+	Player *getOpponent();
+	void setOpponent(Player *opponent);
 };
 
 #endif // PLAYER_H

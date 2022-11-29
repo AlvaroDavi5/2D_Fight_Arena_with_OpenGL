@@ -180,7 +180,7 @@ void init(int argc, char *argv[])
 
 	// view window initialization
 	glutInitWindowSize(viewingWidth, viewingHeight); // declares window size
-	glutInitWindowPosition(100.0, 100.0);								 // declares window position
+	glutInitWindowPosition(100.0, 100.0);						 // declares window position
 	glutCreateWindow("Fight");											 // create window with title
 
 	registerCallbacks();
@@ -260,10 +260,17 @@ int main(int argc, char *argv[])
 		// adjust positions
 		viewingWidth = arena.getWidth();
 		viewingHeight = arena.getHeight();
+
 		player.setPosX(player.getPosX() - arena.getPosX());
 		player.setPosY(player.getPosY() - arena.getPosY());
+		player.setLimits(arena.getWidth(), arena.getHeight());
+		player.setOpponent(&opponent);
+
 		opponent.setPosX(opponent.getPosX() - arena.getPosX());
 		opponent.setPosY(opponent.getPosY() - arena.getPosY());
+		opponent.setLimits(arena.getWidth(), arena.getHeight());
+		opponent.setOpponent(&player);
+
 		arena.setPosX(0.0);
 		arena.setPosY(0.0);
 
