@@ -122,7 +122,10 @@ void _transformSegment(float rx, float ry, float dx, float dy, float t, float &x
 			xOut, yOut);
 }
 
-void _renderArm(float pos[], float radius, float playerAngle, float armsAngles[], float armsWidths[], float armsHeights[], float color[], float handColor[], bool invert)
+void _renderArm(
+		float pos[], float radius, float playerAngle,
+		float armsAngles[], float armsWidths[], float armsHeights[],
+		float color[], float handColor[], float *handPos, bool invert)
 {
 	float armAngle = armsAngles[0], foreArmAngle = armsAngles[1];
 	float armWidth = armsWidths[0], foreArmWidth = armsWidths[1];
@@ -201,11 +204,13 @@ void _renderArm(float pos[], float radius, float playerAngle, float armsAngles[]
 			color);
 
 	// hand
-	float handPos[2] = {foreArmP3[0], foreArmP3[1]};
+	float handPosition[2] = {foreArmP3[0], foreArmP3[1]};
 	float handRadius = radius / 2.0f;
 
+	handPos[0] = handPosition[0];
+	handPos[1] = handPosition[1];
 	_drawCircle(
-			handPos, handRadius,
+			handPosition, handRadius,
 			GL_TRIANGLE_FAN, handColor);
 }
 
@@ -239,33 +244,80 @@ void Player::render()
 			playerPos, playerRadius,
 			playerAngle, leftArmAngle,
 			armsWidths, armsHeights,
-			skinColor, playerColor, false);
+			skinColor, playerColor, this->leftHandPos, false);
 	_renderArm(
 			playerPos, playerRadius,
 			playerAngle, rightArmAngle,
 			armsWidths, armsHeights,
-			skinColor, playerColor, true);
+			skinColor, playerColor, this->rightHandPos, true);
 
 	if (SHOW_COLLISION_CIRCLE)
 	{
 		_drawCircle(
-				playerPos, (armHeight * 1.5f) + playerRadius,
+				playerPos, playerRadius * 2.5,
 				GL_LINE_LOOP, defaultColor);
 	}
+}
+
+bool Player::collidedWithOpponent(bool invertRadius)
+{
+	Player *opponent = this->getOpponent();
+	if (opponent == NULL)
+		return false;
+
+	float playerRadius = this->getRadius() * 2.5, playerAngle = this->getAngle();
+	float opponentRadius = opponent->getRadius();
+
+	if (invertRadius)
+	{
+		playerAngle += _degreeToRadian(180.0);
+	}
+
+	float dir[2] = {playerRadius, 0.0};
+	_rotatePoint(
+			dir[0], dir[1],
+			playerAngle,
+			dir[0], dir[1]);
+	_translatePoint(
+			this->getPosX(), this->getPosY(),
+			dir[0], dir[1]);
+
+	float target[2] = {opponentRadius, 0.0};
+	_rotatePoint(
+			target[0], target[1],
+			playerAngle + _degreeToRadian(180.0),
+			target[0], target[1]);
+	_translatePoint(
+			opponent->getPosX(), opponent->getPosY(),
+			target[0], target[1]);
+
+	// TODO - fix player collision
+	return (dir[0] >= target[0]) && (dir[0] < opponent->getPosX());
 }
 
 void Player::move(float inc)
 {
 	float playerPos[2] = {this->getPosX(), this->getPosY()};
-	float playerAngle = this->getAngle();
+	float playerAngle = this->getAngle(), playerRadius = this->getRadius();
+	const bool invertRadius = inc < 0.0;
 
 	_translatePoint(
 			inc * cos(playerAngle),
 			inc * sin(playerAngle),
 			playerPos[0], playerPos[1]);
 
-	this->setPosX(playerPos[0]);
-	this->setPosY(playerPos[1]);
+	if ((playerPos[0] - playerRadius) > 0 &&
+			(playerPos[0] + playerRadius) < this->maxPos[0] &&
+			!this->collidedWithOpponent(invertRadius))
+	{
+		this->setPosX(playerPos[0]);
+	}
+	if ((playerPos[1] - playerRadius) > 0 &&
+			(playerPos[1] + playerRadius) < this->maxPos[1] &&
+			!this->collidedWithOpponent(invertRadius))
+	{
+		this->setPosY(playerPos[1]);
+	}
 }
 void Player::rotate(float inc)
 {
@@ -287,6 +339,28 @@ void Player::rotate(float inc)
 	}
 
 	this->setAngle(dirAngle);
+}
+void Player::goTo(float x, float y, float incMove, float incAngle)
+{
+	float newAngle = _degreeToRadian(_radianToDegree(this->getAngle()) + incAngle);
+
+	float dirVect[2] = {this->getRadius(), 0.0};
+	_rotatePoint(
+			dirVect[0], dirVect[1],
+			newAngle, dirVect[0], dirVect[1]);
+
+	float dirVectNorm = sqrt(pow(dirVect[0], 2) + pow(dirVect[1], 2));
+	float unitVect[2] = {
+			dirVect[0] / dirVectNorm,
+			dirVect[1] / dirVectNorm};
+	float dirAngle = atan2(unitVect[1], unitVect[0]);
+	if (isnan(dirAngle))
+	{
+		dirAngle = _degreeToRadian(90.0);
+	}
+
+	this->setAngle(dirAngle);
+	this->move(incMove);
 }
 
 float *Player::getColor()
@@ -315,6 +389,11 @@ const float Player::getPosY()
 void Player::setPosY(const float y)
 {
 	this->posY = y;
+}
+void Player::setLimits(const float x, const float y)
+{
+	this->maxPos[0] = x;
+	this->maxPos[1] = y;
 }
 
 const float Player::getAngle()
@@ -358,7 +437,7 @@ const float Player::getRadius()
 }
 void Player::setRadius(const float r)
 {
-	this->bodyRadius = r;
+	this->bodyRadius = abs(r);
 }
 
 void Player::setLeftArmAngle(float radianAngle, float degreeAngle)
@@ -379,4 +458,13 @@ const bool Player::getCollision()
 void Player::setCollision(const bool collision)
 {
 	this->wasCollision = collision;
+}
+
+Player *Player::getOpponent()
+{
+	return this->opponent;
+}
+void Player::setOpponent(Player *opponent)
+{
+	this->opponent = opponent;
 }

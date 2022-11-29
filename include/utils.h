@@ -25,9 +25,6 @@ public:
 	~Utils();
 
 	// ? Member Functions
-	time_t parseStringToTime(const char *strDate);
-	const string parseTimeToString(const time_t time);
-
 	void setColorArrayByColorName(const string colorName, float colorArray[]);
 };
 
