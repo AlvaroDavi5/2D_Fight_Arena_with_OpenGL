@@ -18,13 +18,12 @@ using namespace std;
 using namespace tinyxml2;
 
 #define WINDOW_DEFAULT_SIZE 600
-#define MOVE_INC_KEY 2.0
-#define ROTATE_INC_KEY 1.0
-#define PUNCH_INC_KEY 0.1
 #define ARM_ROTATE_ANGLE 60.0
 
 float viewingWidth = float(WINDOW_DEFAULT_SIZE) - 200.0;
 float viewingHeight = float(WINDOW_DEFAULT_SIZE) - 200.0;
+float moveIncKey = 2.0, rotateIncKey = 1.0;
+bool enableCircles = false, moveOpponent = true;
 int keyStatus[256];
 float mousePosXVect[2] = {0.0, 0.0};
 bool mouseFree = false;
@@ -51,6 +50,21 @@ void keyPress(unsigned char key, int x, int y)
 {
 	switch (key)
 	{
+	case '\'':
+		player.enableCircles = !player.enableCircles;
+		opponent.enableCircles = !opponent.enableCircles;
+		break;
+	case ' ':
+		moveOpponent = !moveOpponent;
+		break;
+	case '+':
+		if (moveIncKey < 10.0)
+			moveIncKey += 0.5;
+		break;
+	case '-':
+		if (moveIncKey > 0.0)
+			moveIncKey -= 0.5;
+		break;
 	case 'w':
 	case 'W':
 		keyStatus[(int)('w')] = 1; // using keyStatus trick
@@ -126,23 +140,23 @@ void idle(void)
 	// player movement
 	if (keyStatus[(int)('w')])
 	{
-		player.move(+MOVE_INC_KEY);
+		player.move(+moveIncKey);
 		moved = true;
 	}
 	if (keyStatus[(int)('s')])
 	{
-		player.move(-MOVE_INC_KEY);
+		player.move(-moveIncKey);
 		moved = true;
 	}
 	// player rotation
 	if (keyStatus[(int)('a')])
 	{
-		player.rotate(+ROTATE_INC_KEY);
+		player.rotate(+rotateIncKey);
 		moved = true;
 	}
 	if (keyStatus[(int)('d')])
 	{
-		player.rotate(-ROTATE_INC_KEY);
+		player.rotate(-rotateIncKey);
 		moved = true;
 	}
 
@@ -152,12 +166,11 @@ void idle(void)
 		player.setRightArmAngle(playerAngle, 0.0);
 	}
 
-	if (opponent.getPosX() != player.getPosX() ||
-			opponent.getPosY() != player.getPosY())
+	if (moveOpponent)
 	{
 		opponent.goTo(
 				player.getPosX(), player.getPosY(),
-				(MOVE_INC_KEY / 2.0), ROTATE_INC_KEY);
+				(moveIncKey / 2.0), rotateIncKey);
 	}
 
 	// TODO - treat punch

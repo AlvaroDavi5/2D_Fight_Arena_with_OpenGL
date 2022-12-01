@@ -251,70 +251,44 @@ void Player::render()
 			armsWidths, armsHeights,
 			skinColor, playerColor, this->rightHandPos, true);
 
-	if (SHOW_COLLISION_CIRCLE)
+	if (this->enableCircles)
 	{
 		_drawCircle(
-				playerPos, playerRadius * 2.5,
+				playerPos, playerRadius * COLLISION_CIRCLE_TAX,
 				GL_LINE_LOOP, defaultColor);
 	}
-}
-
-bool Player::collidedWithOpponent(bool invertRadius)
-{
-	Player *opponent = this->getOpponent();
-	if (opponent == NULL)
-		return false;
-
-	float playerRadius = this->getRadius() * 2.5, playerAngle = this->getAngle();
-	float opponentRadius = opponent->getRadius();
-
-	if (invertRadius)
-	{
-		playerAngle += _degreeToRadian(180.0);
-	}
-
-	float dir[2] = {playerRadius, 0.0};
-	_rotatePoint(
-			dir[0], dir[1],
-			playerAngle,
-			dir[0], dir[1]);
-	_translatePoint(
-			this->getPosX(), this->getPosY(),
-			dir[0], dir[1]);
-
-	float target[2] = {opponentRadius, 0.0};
-	_rotatePoint(
-			target[0], target[1],
-			playerAngle + _degreeToRadian(180.0),
-			target[0], target[1]);
-	_translatePoint(
-			opponent->getPosX(), opponent->getPosY(),
-			target[0], target[1]);
-
-	// TODO - fix player collision
-	return (dir[0] >= target[0]) && (dir[0] < opponent->getPosX());
 }
 
 void Player::move(float inc)
 {
 	float playerPos[2] = {this->getPosX(), this->getPosY()};
 	float playerAngle = this->getAngle(), playerRadius = this->getRadius();
-	const bool invertRadius = inc < 0.0;
 
 	_translatePoint(
 			inc * cos(playerAngle),
 			inc * sin(playerAngle),
 			playerPos[0], playerPos[1]);
 
-	if ((playerPos[0] - playerRadius) > 0 &&
-			(playerPos[0] + playerRadius) < this->maxPos[0] &&
-			!this->collidedWithOpponent(invertRadius))
+	// TODO - fix collision radius
+	const float playerCollisionRadius = playerRadius;
+	const float playerExtremityLeft = (playerPos[0] - playerCollisionRadius), playerExtremityRight = (playerPos[0] + playerCollisionRadius);
+	const float playerExtremityBottom = (playerPos[1] - playerCollisionRadius), playerExtremityTop = (playerPos[1] + playerCollisionRadius);
+	const float opponentRadius = this->opponent->getRadius();
+	const float opponentExtremityLeft = (this->opponent->getPosX() - opponentRadius), opponentExtremityRight = (this->opponent->getPosX() + opponentRadius);
+	const float opponentExtremityBottom = (this->opponent->getPosY() - opponentRadius), opponentExtremityTop = (this->opponent->getPosY() + opponentRadius);
+
+	const bool canIMoveInX = (playerExtremityRight < opponentExtremityLeft) || (playerExtremityLeft > opponentExtremityRight);
+	const bool canIMoveInY = (playerExtremityTop < opponentExtremityBottom) || (playerExtremityBottom > opponentExtremityTop);
+
+	if (playerExtremityLeft > 0 &&
+			playerExtremityRight < this->maxPos[0] &&
+			(canIMoveInX || canIMoveInY))
 	{
 		this->setPosX(playerPos[0]);
 	}
-	if ((playerPos[1] - playerRadius) > 0 &&
-			(playerPos[1] + playerRadius) < this->maxPos[1] &&
-			!this->collidedWithOpponent(invertRadius))
+	if (playerExtremityBottom > 0 &&
+			playerExtremityTop < this->maxPos[1] &&
+			(canIMoveInY || canIMoveInX))
 	{
 		this->setPosY(playerPos[1]);
 	}
@@ -340,16 +314,14 @@ void Player::rotate(float inc)
 
 	this->setAngle(dirAngle);
 }
-void Player::goTo(float x, float y, float incMove, float incAngle)
+void Player::goTo(float x, float y, float incMove, float incRot)
 {
-	float newAngle = _degreeToRadian(_radianToDegree(this->getAngle()) + incAngle);
-
-	float dirVect[2] = {this->getRadius(), 0.0};
-	_rotatePoint(
-			dirVect[0], dirVect[1],
-			newAngle, dirVect[0], dirVect[1]);
-
+	// TODO - fix movement
+	float dirVect[2] = {
+			(x - this->getPosX()),
+			(y - this->getPosY())};
 	float dirVectNorm = sqrt(pow(dirVect[0], 2) + pow(dirVect[1], 2));
+
 	float unitVect[2] = {
 			dirVect[0] / dirVectNorm,
 			dirVect[1] / dirVectNorm};
@@ -358,9 +330,15 @@ void Player::goTo(float x, float y, float incMove, float incAngle)
 	{
 		dirAngle = _degreeToRadian(90.0);
 	}
+	float actualAngle = this->getAngle();
 
-	this->setAngle(dirAngle);
-	this->move(incMove);
+	if (actualAngle < dirAngle)
+		this->rotate(+incRot);
+	else if (actualAngle > dirAngle)
+		this->rotate(-incRot);
+
+	if ((this->getAngle() == dirAngle) && (this->getPosX() != x || this->getPosY() != y))
+		this->move(incMove);
 }
 
 float *Player::getColor()
