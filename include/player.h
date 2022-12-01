@@ -9,7 +9,7 @@
 #include <GL/glut.h>
 #include "./utils.h"
 
-#define SHOW_COLLISION_CIRCLE true
+#define COLLISION_CIRCLE_TAX 2.5
 #define DEFAULT_ARM_INCLINATION 15.0
 
 using namespace std;
@@ -29,10 +29,11 @@ private:
 	float leftHandPos[2] = {0.0, 0.0};
 	float rightHandPos[2] = {0.0, 0.0};
 	Player *opponent = NULL;
-	// // Private Methods
-	bool collidedWithOpponent(bool invertRadius);
 
 public:
+	// // Public Attributes
+	bool enableCircles = false;
+
 	// ! Constructor(s) and Destructor Methods
 	Player();
 	Player(float x, float y);
@@ -68,7 +69,7 @@ public:
 	Player *getOpponent();
 	void setOpponent(Player *opponent);
 
-	void goTo(float x, float y, float incMove, float incAngle);
+	void goTo(float x, float y, float incMove, float incRot);
 };
 
 #endif // PLAYER_H
