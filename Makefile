@@ -33,21 +33,29 @@ VALGRIND_FLAGS=-s \
 
 # target 'run' feito para executar o programa
 run: all
-	@ ./bin/${BIN_NAME}
+	@ ./bin/${BIN_NAME} ./assets/arena_2.svg
 # ./ executa binario local
 
 
-# target 'valgrind' feito para verificar vazamentos de memoria no programa
-valgrind: all
-	@ clear
-	@ valgrind ${VALGRIND_FLAGS} ./bin/${BIN_NAME} ./assets/arena_1.svg
+# target 'watch' feito para verificar estatisiticas de renderizacao
+watch: all
+	@ mangohud  ./bin/${BIN_NAME} ./assets/arena_2.svg
 
-# target 'mangohud' feito para verificar estatisiticas de renderizacao
-mangohud: all
-	@ mangohud  ./bin/${BIN_NAME} ./assets/arena_1.svg
+
+# target 'check' feito para verificar vazamentos de memoria no programa
+check: all
+	@ clear
+	@ valgrind ${VALGRIND_FLAGS} ./bin/${BIN_NAME} ./assets/arena_2.svg
+
+
+# usar GDB
+debug: all
+	@ clear
+	@ gdb ./bin/${BIN_NAME} ./assets/arena_2.svg
+
 
 # o target 'all' tem como pre-requisito a variavel 'BIN_NAME' e a variavel 'objectFolder', que se tornam targets
-all: objectFolder ./bin/${BIN_NAME} ./${BIN_NAME}
+all: objectFolder ./bin/${BIN_NAME}
 	@ echo " \033[1;32m  Tudo feito!  \033[0m "
 	@ echo ''
 # ${} e $() podem igualmente ser usadas para macros
@@ -60,9 +68,6 @@ objectFolder:
 	@ mkdir -p logs
 # -p nao gera erro caso ja exista
 
-
-./${BIN_NAME}: ${OBJ}
-	@ ${CPL} $^  ${GL_FLAGS} -o $@
 
 # o target 'BIN_NAME' tem como pre-requisito a macro 'OBJ' e seus arquivos
 ./bin/${BIN_NAME}: ${OBJ}
@@ -90,7 +95,7 @@ objectFolder:
 
 # o target 'clean' nao tem como pre-requisito, serve para remover arquivos residuais
 clean:
-	@ rm -rf ./logs ./object/*.o *~ ./bin/${BIN_NAME} ${BIN_NAME}
+	@ rm -rf ./logs ./object/*.o *~ ./bin/${BIN_NAME}
 	@ rmdir object bin
 	@ echo " \033[1;31m  Removendo binario \033[41;1;37m./bin/${BIN_NAME}\033[0m\033[1;31m e objetos de compilacao \033[41;1;37m${OBJ}\033[0m\033[1;31m e arquivos de backup  \033[0m "
 	@ echo ''
