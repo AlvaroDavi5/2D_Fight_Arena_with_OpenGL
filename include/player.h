@@ -69,7 +69,7 @@ public:
 	Player *getOpponent();
 	void setOpponent(Player *opponent);
 
-	void goTo(float x, float y, float incMove, float incRot);
+	void goTo(float x, float y, float incMove);
 };
 
 #endif // PLAYER_H

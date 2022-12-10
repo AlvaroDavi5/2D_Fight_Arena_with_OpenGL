@@ -314,9 +314,8 @@ void Player::rotate(float inc)
 
 	this->setAngle(dirAngle);
 }
-void Player::goTo(float x, float y, float incMove, float incRot)
+void Player::goTo(float x, float y, float incMove)
 {
-	// TODO - fix movement
 	float dirVect[2] = {
 			(x - this->getPosX()),
 			(y - this->getPosY())};
@@ -332,12 +331,10 @@ void Player::goTo(float x, float y, float incMove, float incRot)
 	}
 	float actualAngle = this->getAngle();
 
-	if (actualAngle < dirAngle)
-		this->rotate(+incRot);
-	else if (actualAngle > dirAngle)
-		this->rotate(-incRot);
+	if (actualAngle != dirAngle)
+		this->setAngle(dirAngle);
 
-	if ((this->getAngle() == dirAngle) && (this->getPosX() != x || this->getPosY() != y))
+	if (this->getPosX() != x || this->getPosY() != y)
 		this->move(incMove);
 }
 

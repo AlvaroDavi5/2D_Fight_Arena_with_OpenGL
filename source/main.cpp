@@ -169,8 +169,9 @@ void idle(void)
 	if (moveOpponent)
 	{
 		opponent.goTo(
-				player.getPosX(), player.getPosY(),
-				(moveIncKey / 2.0), rotateIncKey);
+				player.getPosX(),
+				player.getPosY(),
+				(moveIncKey / 2.0));
 	}
 
 	// TODO - treat punch
@@ -287,6 +288,7 @@ int main(int argc, char *argv[])
 		opponent.setPosY(opponent.getPosY() - arena.getPosY());
 		opponent.setLimits(arena.getWidth(), arena.getHeight());
 		opponent.setOpponent(&player);
+		// TODO - starts in front of player
 		opponent.rotate(180.0);
 
 		arena.setPosX(0.0);
