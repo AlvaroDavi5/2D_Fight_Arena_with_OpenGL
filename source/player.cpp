@@ -263,32 +263,33 @@ void Player::move(float inc)
 {
 	float playerPos[2] = {this->getPosX(), this->getPosY()};
 	float playerAngle = this->getAngle(), playerRadius = this->getRadius();
+	const float opponentRadius = this->opponent->getRadius();
+	const float playerCollisionRadius = playerRadius * COLLISION_CIRCLE_TAX;
 
 	_translatePoint(
 			inc * cos(playerAngle),
 			inc * sin(playerAngle),
 			playerPos[0], playerPos[1]);
 
-	// TODO - fix collision radius
-	const float playerCollisionRadius = playerRadius;
-	const float playerExtremityLeft = (playerPos[0] - playerCollisionRadius), playerExtremityRight = (playerPos[0] + playerCollisionRadius);
-	const float playerExtremityBottom = (playerPos[1] - playerCollisionRadius), playerExtremityTop = (playerPos[1] + playerCollisionRadius);
-	const float opponentRadius = this->opponent->getRadius();
+	const float playerExtremityLeft = (playerPos[0] - playerRadius), playerExtremityRight = (playerPos[0] + playerRadius);
+	const float playerExtremityBottom = (playerPos[1] - playerRadius), playerExtremityTop = (playerPos[1] + playerRadius);
 	const float opponentExtremityLeft = (this->opponent->getPosX() - opponentRadius), opponentExtremityRight = (this->opponent->getPosX() + opponentRadius);
 	const float opponentExtremityBottom = (this->opponent->getPosY() - opponentRadius), opponentExtremityTop = (this->opponent->getPosY() + opponentRadius);
 
-	const bool canIMoveInX = (playerExtremityRight < opponentExtremityLeft) || (playerExtremityLeft > opponentExtremityRight);
-	const bool canIMoveInY = (playerExtremityTop < opponentExtremityBottom) || (playerExtremityBottom > opponentExtremityTop);
+	const bool canMoveInX = ((playerPos[0] + playerCollisionRadius) < opponentExtremityLeft) ||
+													((playerPos[0] - playerCollisionRadius) > opponentExtremityRight);
+	const bool canMoveInY = ((playerPos[1] + playerCollisionRadius) < opponentExtremityBottom) ||
+													((playerPos[1] - playerCollisionRadius) > opponentExtremityTop);
 
 	if (playerExtremityLeft > 0 &&
 			playerExtremityRight < this->maxPos[0] &&
-			(canIMoveInX || canIMoveInY))
+			(canMoveInX || canMoveInY))
 	{
 		this->setPosX(playerPos[0]);
 	}
 	if (playerExtremityBottom > 0 &&
 			playerExtremityTop < this->maxPos[1] &&
-			(canIMoveInY || canIMoveInX))
+			(canMoveInY || canMoveInX))
 	{
 		this->setPosY(playerPos[1]);
 	}
